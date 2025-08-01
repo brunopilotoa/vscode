@@ -9,9 +9,9 @@ df = pd.read_excel(
     sheet_name="NCs_H23",
 )
 
-print(df.head())
 
 st.header("Visualização de Dados Hangar 23")
+st.divider()
 
 
 def streamlit_settings():
@@ -31,51 +31,41 @@ def data_manipulation():
     df["Data"] = df["Data"].dt.strftime("%d-%m-%y")
     df["Ação de Correção"] = df["Ação de Correção"].str.capitalize()
     df["Falha Reincidente"] = df["Falha Reincidente"].str.capitalize()
-    nc = df["Descrição da Não Conformidade"].value_counts()
 
-    return (df, nc)
+    return df
 
 
 def main():
     streamlit_settings()
     data_manipulation()
     file_loader_nc("W:\H23 - Montagem Final\Base de Dados_Montagem Final_H23_2025.xlsx")
+    ncs = df["Class NC"].value_counts().sum()
     quantidade_nc = df["Class NC"].value_counts()
+    # quantidade_nc_prefixo = df[""]
     nc = df["Descrição da Não Conformidade"].value_counts()
-
-    # (tab1, tab2, tab3, tab4) = st.tabs(
-    #    ["Visão Geral", "NCs", "Progresso ", "Visão Individual"]
-    # )
-    # with tab1:
-    #    st.divider()
-    # st.subheader(prefixo)
-    #    col1, col2 = st.columns(2, gap="large")
-
-    # with col3:
-    # with tab1:
-    (col1, col2) = st.columns(2)
+    # quantidade_nc["count"] = quantidade_nc["count"]
+    (col1, col2) = st.columns(2, gap="large")
     with col1:
         # Figura que Mostra a Quantidade de Items por Setor AVI,GMP,CEL
         fig = (
             px.bar(
                 quantidade_nc,
                 y="count",
-                # y="Prefixo",
                 title="Quantidade de NC por Setor",
             )
             .update_xaxes(categoryorder="total descending", title="Setor")
-            .update_yaxes(title="Quantidade de NCs")
+            .update_yaxes(title="Quantia")
         )
-        average_value = quantidade_nc.mean()
+        # average_value = quantidade_nc.mean()
         fig.update_traces(width=0.7)
-        fig.update_layout(hovermode="x")
-        fig.add_hline(
-            y=average_value,
-            line_dash="dash",
-            line_color="white",
-            annotation_text=f"Media: {average_value:.0f}",
-            annotation_position="bottom right",
-        )
+        fig.update_layout(hovermode="x", title_x=0.3)
+        # fig.add_hline(
+        #    y=average_value,
+        #    line_dash="dash",
+        #    line_color="white",
+        #    annotation_text=f"Media: {average_value:.0f}",
+        #    annotation_position="bottom right",
+        # )
         st.plotly_chart(
             fig,
         )
@@ -83,20 +73,30 @@ def main():
         tipo_nc = df["Tipo NC"].value_counts().reset_index()
         tipo_nc.columns = ["Tipo NC", "Quantia"]
         most5 = tipo_nc[:5]
-        fig3 = (
-            px.pie(
-                most5,
-                title="As 5 Maiores Falhas",
-                values="Quantia",
-                names="Tipo NC",
-            )
-            .update_yaxes(title="Quantias", categoryorder="total ascending")
-            .update_xaxes(title="", tickangle=-60)
+        fig3 = px.pie(
+            most5,
+            title="As 5 Maiores Falhas",
+            values="Quantia",
+            names="Tipo NC",
         )
+        fig3.update_layout(title_x=0.2)
         fig3.update_traces(textposition="inside", textinfo="label+percent")
         st.plotly_chart(fig3)
-        # avg_nc = tipo_nc.median()
-
+        ## ocorrencia por mes
+        fig_mes = (
+            px.bar(
+                df,
+                x="Data NC",
+                title="Ocorrência por Data",
+                # height=500
+            )
+            .update_yaxes(title="Quantidade Por Data", categoryorder="total ascending")
+            .update_xaxes(title="count", tickangle=-50)
+        )
+        fig_mes.update_layout(title_x=0.4)
+        st.plotly_chart(
+            fig_mes,
+        )
     with col2:
         ## ocorrencia por cada aeronave
         fig4 = (
@@ -106,30 +106,24 @@ def main():
             )
             .update_xaxes(title="Prefixo", tickangle=-50)
         )
+        fig4.update_layout(title_x=0.3)
         st.plotly_chart(
             fig4,
         )
-        ## ocorrencia por mes
-        #   st.dataframe(df)
-        # df["Data NC"] = pd.to_datetime(df["Data NC"], errors="coerce", format="%d%m%Y")
-        # fig_mes = (
-        #    px.bar(df, x="Data NC", title="Ocorrencia por Mes")
-        #    .update_yaxes(title="Quantidade Mensal", categoryorder="total ascending")
-        #    .update_xaxes(title="count", tickangle=-50)
-        # )
-        # st.plotly_chart(
-        #    fig_mes,
-        # )
-        # with col4:
         # Mais ocorridas
         nc = nc[:10]
         fig2 = (
-            px.bar(nc, x="count", title="Mais Frequentes e Suas Quantias")
-            .update_xaxes(
-                title="",
+            px.bar(
+                nc,
+                x="count",
+                title="Mais Frequentes",
             )
-            .update_yaxes(categoryorder="total ascending", title="")
+            .update_xaxes(
+                title="Quantidade",
+            )
+            .update_yaxes(categoryorder="total ascending", title="Titulo Nc")
         )
+        fig2.update_layout(title_x=0.5)
         st.plotly_chart(
             fig2,
         )
