@@ -71,6 +71,22 @@ def main():
         st.plotly_chart(
             fig,
         )
+        # Mais ocorridas
+        nc = nc[:10]
+        fig2 = (
+            px.bar(nc, x="count", title="Mais Frequentes", color="count")
+            .update_xaxes(
+                title="Quantidade",
+            )
+            .update_yaxes(
+                categoryorder="total ascending",
+                # title="Titulo Nc"
+            )
+        )
+        fig2.update_layout(title_x=0.5)
+        st.plotly_chart(
+            fig2,
+        )
         # Filtrando por Tipo de NC
         tipo_nc = df["Tipo NC"].value_counts().reset_index()
         tipo_nc.columns = ["Tipo NC", "Quantia"]
@@ -84,6 +100,19 @@ def main():
         fig3.update_layout(title_x=0.2)
         fig3.update_traces(textposition="inside", textinfo="label+percent")
         st.plotly_chart(fig3)
+    with col2:
+        ## ocorrencia por cada aeronave
+        fig4 = (
+            px.bar(df, x="Prefixo", title="Ocorrencia por Aeronaves", color="Prefixo")
+            .update_yaxes(
+                title="Quantidade Por Aeronave", categoryorder="total ascending"
+            )
+            .update_xaxes(title="Prefixo", tickangle=-50)
+        )
+        fig4.update_layout(title_x=0.3)
+        st.plotly_chart(
+            fig4,
+        )
         ## ocorrencia por mes
         fig_mes = (
             px.bar(
@@ -100,32 +129,17 @@ def main():
         st.plotly_chart(
             fig_mes,
         )
-    with col2:
-        ## ocorrencia por cada aeronave
-        fig4 = (
-            px.bar(df, x="Prefixo", title="Ocorrencia por Aeronaves", color="Prefixo")
-            .update_yaxes(
-                title="Quantidade Por Aeronave", categoryorder="total ascending"
-            )
-            .update_xaxes(title="Prefixo", tickangle=-50)
+        fig10 = px.bar(
+            most5,
+            title="As 5 Maiores Falhas",
+            x="Tipo NC",
+            y="Quantia",
+            color="Tipo NC",
+            # names="Tipo NC",
         )
-        fig4.update_layout(title_x=0.3)
-        st.plotly_chart(
-            fig4,
-        )
-        # Mais ocorridas
-        nc = nc[:10]
-        fig2 = (
-            px.bar(nc, x="count", title="Mais Frequentes", color="count")
-            .update_xaxes(
-                title="Quantidade",
-            )
-            .update_yaxes(categoryorder="total ascending", title="Titulo Nc")
-        )
-        fig2.update_layout(title_x=0.5)
-        st.plotly_chart(
-            fig2,
-        )
+        # fig10.update_layout(title_x=0.2)
+        # fig10.update_traces(textposition="inside", textinfo="label+percent")
+        st.plotly_chart(fig10)
 
 
 main()

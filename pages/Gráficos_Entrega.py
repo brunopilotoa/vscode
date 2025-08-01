@@ -1,4 +1,5 @@
 from app import pd, st, px, df
+import statsmodels.api as sm
 
 df_panes = pd.read_excel(
     "W:\H23 - Montagem Final\Base de Dados_Montagem Final_H23_2025.xlsx",
@@ -6,6 +7,7 @@ df_panes = pd.read_excel(
     # sheet_name="NCs_H23",
     header=1,
 )
+# meta = st.slider(label="Meta de Aeronaves Anual", min_value=1, max_value=50)
 col1, col2 = st.columns(2, gap="small")
 with col1:
     vti_aprovado = df_panes[
@@ -29,7 +31,7 @@ with col1:
                 "Data Recebimento",
             ],
             title="Progresso entre a Data de Recebimento até a Data da VTI",
-            # trendline="expanding",
+            # trendline="ols",
             # trendline_scope="overall",
         )
         .update_xaxes(title="")
@@ -43,6 +45,18 @@ with col1:
     # annotation_position="bottom right",
     # )
     st.plotly_chart(fig5)
+    vti_aprovado["dias_para_vti"] = (
+        vti_aprovado["Data VTI"] - vti_aprovado["Data Recebimento"]
+    ).dt.days
+
+    fig7 = px.scatter(
+        vti_aprovado,
+        x="Data Recebimento",  # manter como data
+        y="dias_para_vti",  # valor numérico para regressão
+        title="Dias entre Data de Recebimento e Data VTI",
+        trendline="ols",
+    )
+    st.plotly_chart(fig7)
 with col2:
     anv_entregue = df_panes[df_panes["STATUS FINAL"] == "ENTREGUE"]
     # entrega = anv_entregue["Data de Entrega Cliente"].dropna()
@@ -77,16 +91,3 @@ anv_entregue_filtered = anv_entregue[["Data de Entrega Cliente", "Prefixo"]]
 anv_entregue_filtered["Data de Entrega Cliente"] = pd.to_datetime(
     anv_entregue_filtered["Data de Entrega Cliente"]
 )
-# anv_entregue_filtered["Mes_Ano"] = (
-#    anv_entregue_filtered["Data de Entrega Cliente"]
-#    .dt.to_period("M")
-#    .value_counts()
-#    .sum()
-# )
-# anv_entregue_filtered["Mes_Ano"]
-
-# figa = px.bar(anv_entregue_filtered, x="Mes_Ano")
-# st.plotly_chart(figa)
-# st.dataframe(anv_entregue, hide_index=True)
-# sum_anv_month = anv_entregue_filtered.groupby("Data de Entrega Cliente").sum()
-# sum_anv_month
