@@ -29,6 +29,7 @@ def data_manipulation():
     ].str.capitalize()
     # df["Data NC"] = df["Data NC"].dt.strftime("%d-%m-%y")
     df["Data"] = df["Data"].dt.strftime("%d-%m-%y")
+    # df["Data NC"] = df["Data NC"].dt.strftime("%d-%m-%y")
     df["Ação de Correção"] = df["Ação de Correção"].str.capitalize()
     df["Falha Reincidente"] = df["Falha Reincidente"].str.capitalize()
 
@@ -52,6 +53,7 @@ def main():
                 quantidade_nc,
                 y="count",
                 title="Quantidade de NC por Setor",
+                color="count",
             )
             .update_xaxes(categoryorder="total descending", title="Setor")
             .update_yaxes(title="Quantia")
@@ -89,6 +91,7 @@ def main():
                 x="Data NC",
                 title="Ocorrência por Data",
                 # height=500
+                color="Prefixo",
             )
             .update_yaxes(title="Quantidade Por Data", categoryorder="total ascending")
             .update_xaxes(title="count", tickangle=-50)
@@ -100,7 +103,7 @@ def main():
     with col2:
         ## ocorrencia por cada aeronave
         fig4 = (
-            px.bar(df, x="Prefixo", title="Ocorrencia por Aeronaves")
+            px.bar(df, x="Prefixo", title="Ocorrencia por Aeronaves", color="Prefixo")
             .update_yaxes(
                 title="Quantidade Por Aeronave", categoryorder="total ascending"
             )
@@ -113,11 +116,7 @@ def main():
         # Mais ocorridas
         nc = nc[:10]
         fig2 = (
-            px.bar(
-                nc,
-                x="count",
-                title="Mais Frequentes",
-            )
+            px.bar(nc, x="count", title="Mais Frequentes", color="count")
             .update_xaxes(
                 title="Quantidade",
             )
