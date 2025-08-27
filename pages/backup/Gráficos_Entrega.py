@@ -1,5 +1,6 @@
 from app import pd, st, px, df
 import statsmodels.api as sm
+import plotly.express as px
 
 df_panes = pd.read_excel(
     "W:\H23 - Montagem Final\Base de Dados_Montagem Final_H23_2025.xlsx",
@@ -7,17 +8,26 @@ df_panes = pd.read_excel(
     # sheet_name="NCs_H23",
     header=1,
 )
+
 # meta = st.slider(label="Meta de Aeronaves Anual", min_value=1, max_value=50)
 col1, col2 = st.columns(2, gap="small")
 with col1:
     vti_aprovado = df_panes[
-        (df_panes["Status VTI"] == "APROVADO") & (df_panes["Data VTI"] != "AGUARDANDO")
+        (df_panes["Status VTI"] == "APROVADO")
+        & (df_panes[["Data VTI", "Data de Entrega Cliente"]] != "AGUARDANDO")
     ]
     vti_aprovado["Data VTI"] = pd.to_datetime(vti_aprovado["Data VTI"])
+    # vti_aprovado["Data de Entrega Cliente"] = pd.to_datetime(
+    #     vti_aprovado["Data de Entrega Cliente"]
+    # )
+    print(vti_aprovado["Data de Entrega Cliente"])
     # data_vti = vti_aprovado[vti_aprovado["Data VTI"]].value_counts()
     # vti_aprovado = vti_aprovado["Data VTI"].dt.strftime("%d/%m/%Y")
-    st.subheader("Aeronaves Aprovadas em VTI")
-    st.markdown(vti_aprovado["Prefixo"].value_counts().sum())
+    st.metric(
+        label="Aeronaves Aprovadas em VTI",
+        value=vti_aprovado["Prefixo"].value_counts().sum(),
+        border=True,
+    )
     st.divider()
 
     # st.metric(vti_aprovado.value_counts().sum())
@@ -56,14 +66,30 @@ with col1:
         title="Dias entre Data de Recebimento e Data VTI",
         trendline="ols",
     )
-    st.plotly_chart(fig7)
+    # st.plotly_chart(fig7)
+
+    vti_aprovado["dias_entrega_cliente"] = (
+        vti_aprovado["Data de Entrega Cliente"] - vti_aprovado["Data Recebimento"]
+    ).dt.days
+
+    fig9 = px.scatter(
+        vti_aprovado,
+        x="Data Recebimento",
+        y="dias_entrega_cliente",
+        title="Dias entre Entrega e Recebimento",
+        trendline="ols",
+    )
+    st.plotly_chart(fig9)
 with col2:
     anv_entregue = df_panes[df_panes["STATUS FINAL"] == "ENTREGUE"]
     # entrega = anv_entregue["Data de Entrega Cliente"].dropna()
     # entrega = pd.to_datetime(entrega)
     # anv_entregue
-    st.subheader("Aeronaves Entregues")
-    st.markdown(anv_entregue["Prefixo"].value_counts().sum())
+    st.metric(
+        label="Aeronaves Entregues",
+        value=anv_entregue["Prefixo"].value_counts().sum(),
+        border=True,
+    )
     st.divider()
 
     fig6 = (
@@ -76,13 +102,13 @@ with col2:
         .update_yaxes(title="")
         .update_xaxes(title="")
     )
-    fig6.add_vline(
-        x="Data de Entrega Cliente",
-        line_dash="dash",
-        line_color="white",
-        #    annotation_text=f"Media: {average_value:.0f}",
-        #    annotation_position="bottom right",
-    )
+    # fig6.add_vline(
+    #     x="Data de Entrega Cliente",
+    #     line_dash="dash",
+    #     line_color="white",
+    #     #    annotation_text=f"Media: {average_value:.0f}",
+    #     #    annotation_position="bottom right",
+    # )
     st.plotly_chart(fig6)
 
 

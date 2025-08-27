@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+import numpy as np
 
 df = pd.read_excel(
     "W:\H23 - Montagem Final\Base de Dados_Montagem Final_H23_2025.xlsx",
@@ -13,6 +13,8 @@ df = pd.read_excel(
 def data_manipulation_ncs():
     # df["Data NC"] = df["Data NC"].dt.strftime("%d/%m/%Y")
     # df["Data"] = df["Data"].dt.strftime("%d/%m/%Y")
+    df["Ação de Correção"] = df["Ação de Correção"].str.capitalize()
+    df["Falha Reincidente"] = df["Falha Reincidente"].str.capitalize()
 
     # df["Data AEV"] = df["Data AEV"].dt.strftime("%d/%m/%Y")
     # if (df["Data VTI"] != "AGUARDANDO").any():
@@ -26,21 +28,33 @@ def data_manipulation_ncs():
 
 
 print(df.columns)
-
 data_manipulation_ncs()
-nc_aberto = df[df["Status"] != "Solucionado"]
+respostas = df[
+    [
+        "PV",
+        "Prefixo",
+        "Class NC",
+        "Descrição da Não Conformidade",
+        # "Data NC",
+        "Ação de Correção",
+        # "Data",
+        "Falha Reincidente",
+        "Status",
+    ]
+].dropna()
+respostas_sorted = sorted(respostas["Descrição da Não Conformidade"].unique())
 
 
 def main():
-    st.set_page_config(page_title="Dashboard", layout="wide")
-    st.header("Visualização de Dados Hangar 23")
-    st.divider()
-    st.markdown(
-        "Este Aplicativo Foi Criado com Objetivo da Visualização de Dados das Aeronaves no Hangar 23"
+    st.title("Panes")
+    st.markdown("Filtra e Responde as NC")
+    pane = st.selectbox(
+        "",
+        respostas_sorted,
     )
-    st.write("Utilize o Menu Lateral Para Navegação")
+    filtered_pane = respostas[respostas["Descrição da Não Conformidade"] == pane]
+    st.dataframe(filtered_pane, hide_index=True)
+    return main
 
 
-# if st.button("Gráficos de Não Conformidade"):
-# st.switch_page("pages/graphs_nc.py")
 main()
