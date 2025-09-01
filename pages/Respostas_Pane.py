@@ -15,7 +15,9 @@ def data_manipulation_ncs():
     # df["Data"] = df["Data"].dt.strftime("%d/%m/%Y")
     df["Ação de Correção"] = df["Ação de Correção"].str.capitalize()
     df["Falha Reincidente"] = df["Falha Reincidente"].str.capitalize()
-
+    df["Descrição da Não Conformidade"] = df[
+        "Descrição da Não Conformidade"
+    ].str.capitalize()
     # df["Data AEV"] = df["Data AEV"].dt.strftime("%d/%m/%Y")
     # if (df["Data VTI"] != "AGUARDANDO").any():
     #    df["Data VTI"] = pd.to_datetime(df["Data VTI"])
@@ -31,18 +33,19 @@ print(df.columns)
 data_manipulation_ncs()
 respostas = df[
     [
+        "Nº",
         "PV",
-        "Prefixo",
-        "Class NC",
+        # "Prefixo",
+        # "Class NC",
         "Descrição da Não Conformidade",
-        # "Data NC",
+        "Data NC",
         "Ação de Correção",
         # "Data",
-        "Falha Reincidente",
-        "Status",
+        # "Falha Reincidente",
+        # "Status",
     ]
 ].dropna()
-respostas_sorted = sorted(respostas["Descrição da Não Conformidade"].unique())
+df = df.sort_values(by="Descrição da Não Conformidade", ascending=True)
 
 
 def main():
@@ -50,7 +53,7 @@ def main():
     st.markdown("Filtra e Responde as NC")
     pane = st.selectbox(
         "",
-        respostas_sorted,
+        df["Descrição da Não Conformidade"],
     )
     filtered_pane = respostas[respostas["Descrição da Não Conformidade"] == pane]
     st.dataframe(filtered_pane, hide_index=True)
