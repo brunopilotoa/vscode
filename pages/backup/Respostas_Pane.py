@@ -55,7 +55,9 @@ def main():
         "",
         df["Descrição da Não Conformidade"],
     )
-    filtered_pane = respostas[respostas["Descrição da Não Conformidade"] == pane]
+    filtered_pane = respostas[
+        respostas["Descrição da Não Conformidade"] == pane
+    ].sort_values(by="Descrição da Não Conformidade")
     st.dataframe(filtered_pane, hide_index=True)
     return main
 

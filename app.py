@@ -8,6 +8,7 @@ df = pd.read_excel(
     header=1,
     sheet_name="NCs_H23",
 )
+df = df.sort_values(by="Nº")
 
 
 def data_manipulation_ncs():
