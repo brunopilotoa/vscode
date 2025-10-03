@@ -17,7 +17,7 @@ def data_manipulation_ncs():
 
     # df["Data AEV"] = df["Data AEV"].dt.strftime("%d/%m/%Y")
     # if (df["Data VTI"] != "AGUARDANDO").any():
-    #    df["Data VTI"] = pd.to_datetime(df["Data VTI"])
+    # df["Data VTI"] = pd.to_datetime(df["Data VTI"])
     # df["Data VTI"] = df["Data VTI"].dt.strftime("%d/%m/%Y")
     # df["Data de Entrega Cliente"] = df["Data de Entrega Cliente"].dt.strftime(
     #    "%d/%m/%Y"
@@ -26,7 +26,7 @@ def data_manipulation_ncs():
     return df
 
 
-print(df.columns)
+# print(df.columns)
 
 data_manipulation_ncs()
 nc_aberto = df[df["Status"] != "Solucionado"]
